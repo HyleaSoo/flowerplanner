@@ -4,6 +4,11 @@ import { speciesNames } from '../FlowerExplainer';
 import styled, { keyframes, css } from 'styled-components';
 import { FlowerIcon } from '../FieldMaker';
 
+import trunks from './trunks.png';
+import goten from './goten.png';
+import gotenks from './gotenks.png';
+import nobody from './nobody.png';
+
 const dur = 0.5;
 const spinI = 4;
 const spinDur = 0.1;
@@ -15,12 +20,12 @@ const random01 = () => {
 const parentOptions = [
   [
     {
-      genes: '01 01 01 00',
-      name: '01 01 01 00 red',
+      genes: '11 01 01 00',
+      name: '11 01 01 00',
     },
     {
-      genes: '01 01 01 00',
-      name: '01 01 01 00 red',
+      genes: '01 11 01 00',
+      name: '01 11 01 00',
     },
   ],
   [
@@ -74,6 +79,7 @@ const FlowerCrosser = () => {
   const crossFlowers = () => {
     setChoiceA(choiceA.map(random01));
     setChoiceB(choiceB.map(random01));
+    // setTimeout(crossFlowers, (4 * dur + spinDur * spinI * 4) * 1000);
   };
 
   const geneC = ['00', '00', '00', '00'].map((output, i) => {
@@ -124,13 +130,21 @@ const FlowerCrosser = () => {
                 pos={choiceA[i]}
                 index={i}
               />}
+              {g === '11' && <img style={{
+                width: 20,
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translateX(-50%) translateY(-50%)'
+              }} src={gotenks}/>}
               <div>
                 {g.split('').map((a, ai) => <Allele
                   key={ai}
                   style={{
                     background: colorA,
+                    border: g === '11' ? 'none' : '',
                   }}
-                >{a}</Allele>)}
+                >{a === '1' && g !== '11' ? <img src={trunks}/> : <img src={nobody}/>}</Allele>)}
               </div>
             </Pair>;
           })}
@@ -162,14 +176,22 @@ const FlowerCrosser = () => {
                 pos={choiceB[i]}
                 index={i}
               />}
+              {g === '11' && <img style={{
+                width: 20,
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translateX(-50%) translateY(-50%)'
+              }} src={gotenks}/>}
               <div>
                 {g.split('').map((a, ai) => <Allele
                   key={ai}
                   style={{
                     background: colorB,
+                    border: g === '11' ? 'none' : '',
                   }}
-                >{a}</Allele>)}
-              </div>
+                  >{a === '1' && g !== '11' ? <img src={goten}/> : <img src={nobody}/>}</Allele>)}
+                </div>
             </Pair>;
           })}
         </GeneContainer>
@@ -185,6 +207,13 @@ const FlowerCrosser = () => {
         <GeneContainer>
           {geneC.split(' ').map((g, i) => {
             return <Pair key={i}>
+              {g === '11' && <GotenksResult style={{
+                width: 20,
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translateX(-50%) translateY(-50%)'
+              }} src={gotenks}/>}
               <div>
                 {g.split('').map((a, ai, arr) => {
                   let sourceIndex = 0;
@@ -202,6 +231,7 @@ const FlowerCrosser = () => {
                     key={ai}
                     style={{
                       backgroundColor: sourceIndex === 0 ? colorA : colorB,
+                      border: g === '11' ? 'none' : '',
                     }}
                     ref={(el: HTMLDivElement) => {
                       if (!el) {
@@ -229,7 +259,13 @@ const FlowerCrosser = () => {
                       }, 20);
                     }}
                   >
-                    {a}
+                    {
+                      a === '1'
+                      ? sourceIndex === 0
+                        ? g === '11' ? <TrunksGotenResult src={trunks}/> : <img src={trunks}/>
+                        : g === '11' ? <TrunksGotenResult src={goten}/> : <img src={goten}/>
+                      : <img src={nobody}/>
+                    }
                   </Allele>;
                 })}
               </div>
@@ -252,7 +288,7 @@ const FlowerCrosser = () => {
 };
 
 const MainContainer = styled.div`
-  width: 600px;
+  width: 650px;
   background: #222;
   margin: 10px auto;
   padding: 20px 10px;
@@ -314,6 +350,17 @@ const IconContainerBottom = styled(IconContainer)`
   opacity: 0;
   animation-fill-mode: forwards;
 `;
+const GotenksResult = styled.img`
+  animation: ${fadein} 0.3s 1;
+  animation-delay: 3s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+`;
+const TrunksGotenResult = styled.img`
+  animation: ${fadein} 0.3s 1 reverse;
+  animation-delay: 3s;
+  animation-fill-mode: forwards;
+`;
 
 const Parent = styled.div`
   display: inline-block;
@@ -335,6 +382,10 @@ const Pair = styled.div`
   position: relative;
   background: rgba(255, 255, 255, 0.3);
   border-radius: 4px;
+
+  img {
+    width: 20px;
+  }
 `;
 const Allele = styled.div`
   display: inline-block;
