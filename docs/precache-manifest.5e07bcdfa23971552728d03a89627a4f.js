@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "d4179349bb440c497728f1d19e363180",
+    "revision": "2494b0341ff30bdca5e8ba846cb1cb53",
     "url": "/flowerplanner/index.html"
   },
   {
-    "revision": "ec6e2b134e9af56810f1",
+    "revision": "398a34ef250159ebe12a",
     "url": "/flowerplanner/static/css/main.0495f308.chunk.css"
   },
   {
-    "revision": "eadcb93dd62a3928ef2e",
-    "url": "/flowerplanner/static/js/2.66109329.chunk.js"
+    "revision": "4f2f601fd42eb77fe3d5",
+    "url": "/flowerplanner/static/js/2.50eb920f.chunk.js"
   },
   {
     "revision": "c64c486544348f10a6d6c716950bc223",
-    "url": "/flowerplanner/static/js/2.66109329.chunk.js.LICENSE.txt"
+    "url": "/flowerplanner/static/js/2.50eb920f.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "ec6e2b134e9af56810f1",
-    "url": "/flowerplanner/static/js/main.2a68e350.chunk.js"
+    "revision": "398a34ef250159ebe12a",
+    "url": "/flowerplanner/static/js/main.28283fcf.chunk.js"
   },
   {
     "revision": "f2487393fbe564a2675d",
@@ -290,5 +290,9 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "32799e5e71fe1d273012294daa65ddf4",
     "url": "/flowerplanner/static/media/marina.32799e5e.jpg"
+  },
+  {
+    "revision": "62acc3037818528e350552ad7a93cf95",
+    "url": "/flowerplanner/static/media/sable.62acc303.png"
   }
 ]);
