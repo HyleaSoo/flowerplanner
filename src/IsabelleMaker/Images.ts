@@ -55,8 +55,10 @@ import Image054 from './img/054.png';
 import Image058 from './img/058.png';
 import ImageNight from './img/blank_night_template.jpg';
 import ImageMarina from './img/marina.jpg';
+import ImageSable from './img/sable.png';
 
 export const images = [
+  ImageSable,
   ImageMarina,
   ImageNight,
   Image007,
