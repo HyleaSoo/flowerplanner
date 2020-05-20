@@ -8,6 +8,7 @@ import SuzuranImage from './img/Suzuran.png';
 import SuzuranWhiteImage from './img/Suzuran_w.png';
 import ClothIcon from './img/Icon_GeneralCloth_00^t.png';
 import TrashIcon from './img/ProfileReplaceIcon^t.png';
+import ScoopIcon from './img/Scoop.png';
 import RoadTexture from './img/RoadTexC^_A.png';
 import GrassTexture from './img/AnimalPatternColor^_D.png';
 import CliffIcon from './img/RoadCreationIconCriff^w.png';
@@ -44,6 +45,8 @@ interface ElevationField {
 enum Blockers {
   PAVEMENT = 1,
   LILYOFTHEVALLEY = 2,
+  CLIFF = 3,
+  CLIFF_INVERT = 4,
 }
 interface Flower {
   species: FlowerNames
@@ -87,9 +90,20 @@ const FieldMaker = () => {
     return c;
   }, {} as { [key: string]: string });
 
-  const onClickCell = (rowIndex: number, colIndex: number) => {
-    return () => {
-      if (isBlocking !== undefined) {
+  const onClickCell = (rowIndex: number, colIndex: number, isRightClick?: boolean) => {
+    return (e: React.MouseEvent) => {
+      if (isBlocking === Blockers.CLIFF || isBlocking === Blockers.CLIFF_INVERT) {
+        const newElevation = { ...elevation };
+        if (!newElevation[rowIndex]) {
+          newElevation[rowIndex] = {};
+        }
+        const isGoingUp = (isBlocking === Blockers.CLIFF && !isRightClick) || (isBlocking === Blockers.CLIFF_INVERT && isRightClick);
+        const newLevel = isGoingUp
+          ? Math.min(2, (newElevation[rowIndex][colIndex] || 0) + 1)
+          : Math.max(0, (newElevation[rowIndex][colIndex] || 0) - 1);
+        newElevation[rowIndex][colIndex] = newLevel;
+        setElevation(newElevation);
+      } else if (isBlocking !== undefined) {
         const newBlockField = {...blockField};
         if (!newBlockField[rowIndex]) {
           newBlockField[rowIndex] = {};
@@ -115,6 +129,11 @@ const FieldMaker = () => {
         }
         setField(newField);
       }
+
+      if (isRightClick) {
+        e.preventDefault();
+        return false;
+      }
     };
   };
 
@@ -124,6 +143,7 @@ const FieldMaker = () => {
   });
 
   const fieldElKeypressHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    return;
     // 113 q, 119 w
     if (String.fromCharCode(e.which).toLowerCase() === 'q') {
       const newElevation = { ...elevation };
@@ -155,6 +175,13 @@ const FieldMaker = () => {
       translateY(${e.clientY}px)
       translateX(20px)
     `;
+    updateCursorImage();
+  };
+  const updateCursorImage = () => {
+    const cursorEl = fakeCursorRef.current;
+    if (!cursorEl) {
+      return;
+    }
     const flowerPath = getFlowerPath({
       species: flowerSpecies,
       genes: flowerGenes,
@@ -163,8 +190,13 @@ const FieldMaker = () => {
     let bgProp = '';
     if (isBlocking === Blockers.LILYOFTHEVALLEY) {
       bgProp = `url(${SuzuranImage})`;
+      cursorEl.style.backgroundSize = '75% auto';
     } else if (isBlocking === Blockers.PAVEMENT) {
       bgProp = `url(${RoadTexture})`;
+      cursorEl.style.backgroundSize = '75% auto';
+    } else if (isBlocking === Blockers.CLIFF || isBlocking === Blockers.CLIFF_INVERT) {
+      bgProp = `url(${ScoopIcon})`;
+      cursorEl.style.backgroundSize = '75% auto';
     } else {
       bgProp = `url(${flowerPath})`;
     }
@@ -233,15 +265,29 @@ const FieldMaker = () => {
         }}
       />
       <img
-        alt={'Elevation: Hover and press Q and W'}
-        title={'Elevation: Hover and press Q and W'}
+        alt={'Left click to elevate, right click to lower'}
+        title={'Left click to elevate, right click to lower'}
         style={{
           width: 48,
-          background: viewPerspective ? 'rgba(255, 255, 255, 0.5)' : '',
+          background: isBlocking === Blockers.CLIFF ? 'rgba(255, 255, 255, 0.5)' : '',
         }}
         src={CliffIcon}
         onClick={() => {
-          setViewPerspective(!viewPerspective);
+          setIsBlocking(Blockers.CLIFF);
+          // setViewPerspective(!viewPerspective);
+        }}
+      />
+      <img
+        alt={'Right click to elevate, left click to lower'}
+        title={'Right click to elevate, left click to lower'}
+        style={{
+          width: 48,
+          background: isBlocking === Blockers.CLIFF_INVERT ? 'rgba(255, 255, 255, 0.5)' : '',
+          transform: 'rotateZ(180deg)',
+        }}
+        src={CliffIcon}
+        onClick={() => {
+          setIsBlocking(Blockers.CLIFF_INVERT);
         }}
       />
       <img
@@ -355,6 +401,7 @@ const FieldMaker = () => {
             return <Cell
               key={colIndex}
               onClick={onClickCell(rowIndex, colIndex)}
+              onContextMenu={onClickCell(rowIndex, colIndex, true)}
               onMouseOver={() => {
                 // setHoverCol(colIndex);
                 // setHoverRow(rowIndex);
@@ -437,6 +484,7 @@ const FakeCursor = styled.div`
   z-index: 5;
   background-size: 100% 100%;
   opacity: 0.8;
+  background-repeat: no-repeat;
 `;
 
 interface FlowerSpeciesOptionProps {
