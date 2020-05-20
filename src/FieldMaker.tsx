@@ -60,6 +60,7 @@ const FieldMaker = () => {
   const [fieldWidth, setFieldWidth] = useState(10);
   const [fieldHeight, setFieldHeight] = useState(10);
 
+  const [isTouchScreen, setIsTouchScreen] = useState(false);
   const [isBlocking, setIsBlocking] = useState(undefined as Blockers | undefined);
   const [flowerSpecies, setFlowerSpecies] = useState(FlowerNames.rose);
   const [flowerGenes, setFlowerGenes] = useState('11 112 11 00');
@@ -209,11 +210,13 @@ const FieldMaker = () => {
     onKeyPress={fieldElKeypressHandler}
     tabIndex={1}
     onMouseMove={updateCursor}
+    onTouchStart={() => {
+      setIsTouchScreen(true);
+    }}
   >
-    <FakeCursor
+    {!isTouchScreen && <FakeCursor
       ref={fakeCursorRef}
-
-    />
+    />}
     <Tools>
       <img
         alt={'Set lily of the valley'}
