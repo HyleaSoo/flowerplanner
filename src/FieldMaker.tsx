@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
 import { FlowerNames, Genes, SeedGenes } from './data/genes';
@@ -42,8 +42,8 @@ interface ElevationField {
 }
 
 enum Blockers {
-  PAVEMENT,
-  LILYOFTHEVALLEY,
+  PAVEMENT = 1,
+  LILYOFTHEVALLEY = 2,
 }
 interface Flower {
   species: FlowerNames
@@ -144,10 +144,44 @@ const FieldMaker = () => {
     }
   };
 
+  const fakeCursorRef = useRef(null as null | HTMLDivElement);
+  const updateCursor = (e: React.MouseEvent) => {
+    const cursorEl = fakeCursorRef.current;
+    if (!cursorEl) {
+      return;
+    }
+    cursorEl.style.transform = `
+      translateX(${e.clientX}px)
+      translateY(${e.clientY}px)
+      translateX(20px)
+    `;
+    const flowerPath = getFlowerPath({
+      species: flowerSpecies,
+      genes: flowerGenes,
+    });
+
+    let bgProp = '';
+    if (isBlocking === Blockers.LILYOFTHEVALLEY) {
+      bgProp = `url(${SuzuranImage})`;
+    } else if (isBlocking === Blockers.PAVEMENT) {
+      bgProp = `url(${RoadTexture})`;
+    } else {
+      bgProp = `url(${flowerPath})`;
+    }
+    if (cursorEl.style.backgroundImage !== bgProp) {
+      cursorEl.style.backgroundImage = bgProp;
+    }
+  };
+
   return <MainContainer
     onKeyPress={fieldElKeypressHandler}
     tabIndex={1}
+    onMouseMove={updateCursor}
   >
+    <FakeCursor
+      ref={fakeCursorRef}
+
+    />
     <Tools>
       <img
         alt={'Set lily of the valley'}
@@ -232,7 +266,7 @@ const FieldMaker = () => {
               setFlowerSpecies(f);
               setIsBlocking(undefined);
             }}
-            active={f === flowerSpecies}
+            active={!isBlocking && f === flowerSpecies}
           >
             <FlowerIcon
               flower={{
@@ -251,7 +285,7 @@ const FieldMaker = () => {
               setFlowerGenes(colorItem[1]);
               setIsBlocking(undefined);
             }}
-            active={colorItem[0] === currentColor}
+            active={!isBlocking && colorItem[0] === currentColor}
           >
             <FlowerIcon
               flower={{
@@ -322,8 +356,8 @@ const FieldMaker = () => {
               key={colIndex}
               onClick={onClickCell(rowIndex, colIndex)}
               onMouseOver={() => {
-                setHoverCol(colIndex);
-                setHoverRow(rowIndex);
+                // setHoverCol(colIndex);
+                // setHoverRow(rowIndex);
               }}
               style={viewBevel ? {
                 zIndex: cellElevation + 1,
@@ -385,10 +419,24 @@ export const resolveFlowerColor = (flower: Flower) => {
 const MainContainer = styled.div`
   margin: 8px 0;
   perspective: 1000px;
+  position: relative;
 
   &:focus {
     outline: none;
   }
+`;
+
+const FakeCursor = styled.div`
+  border-radius: 4px;
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  z-index: 5;
+  background-size: 100% 100%;
+  opacity: 0.8;
 `;
 
 interface FlowerSpeciesOptionProps {
@@ -497,8 +545,8 @@ const Cell = styled.div<CellProps>`
   background-position: center center;
   background-repeat: no-repeat;
   box-sizing: border-box;
-  border: solid 0.5px rgba(0, 0, 0, 0);
   position: relative;
+  border: solid 0.5px rgba(0, 0, 0, 0.2);
 
   ${({ elevation, isBevelled }) => css`
     ${elevation === 1 && css`
@@ -551,7 +599,6 @@ const FieldEl = styled.div<FieldElProps>`
 
   &:hover {
     ${Cell} {
-      border: solid 0.5px rgba(0, 0, 0, 0.2);
     }
   }
 
