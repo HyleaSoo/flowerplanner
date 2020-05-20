@@ -125,7 +125,7 @@ const FieldMaker = () => {
 
   const fieldElKeypressHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
     // 113 q, 119 w
-    if (e.which === 113) {
+    if (String.fromCharCode(e.which).toLowerCase() === 'q') {
       const newElevation = { ...elevation };
       if (!newElevation[hoverRow]) {
         newElevation[hoverRow] = {};
@@ -134,7 +134,7 @@ const FieldMaker = () => {
       newElevation[hoverRow][hoverCol] = newLevel;
       setElevation(newElevation);
     }
-    if (e.which === 119) {
+    if (String.fromCharCode(e.which).toLowerCase() === 'w') {
       const newElevation = { ...elevation };
       if (!newElevation[hoverRow]) {
         newElevation[hoverRow] = {};
